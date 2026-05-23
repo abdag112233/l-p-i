@@ -171,8 +171,9 @@ public final class VanishManager implements Listener {
 
         if (changed) {
             requestSave();
+            broadcastLocalizedVanishQuit(player);
             sendLocalized(player, VANISH_ENABLED_AR, VANISH_ENABLED_EN);
-            logInfo(player.getName() + " (" + uuid + ") is now vanished.");
+            logInfo(player.getName() + " (" + uuid + ") vanished and was announced as having left the game.");
         }
     }
 
@@ -193,8 +194,9 @@ public final class VanishManager implements Listener {
 
         if (changed) {
             requestSave();
+            broadcastLocalizedVanishJoin(player);
             sendLocalized(player, VANISH_DISABLED_AR, VANISH_DISABLED_EN);
-            logInfo(player.getName() + " (" + uuid + ") is now visible.");
+            logInfo(player.getName() + " (" + uuid + ") unvanished and was announced as having joined the game.");
         }
     }
 
@@ -327,7 +329,7 @@ public final class VanishManager implements Listener {
             return;
         }
 
-        broadcastLocalizedQuit(player);
+        broadcastLocalizedQuit(player, false);
         canSeeVanishedCache.remove(player.getUniqueId());
         logInfo(player.getName() + " (" + player.getUniqueId() + ") left the game.");
     }
@@ -340,7 +342,7 @@ public final class VanishManager implements Listener {
             return;
         }
 
-        event.leaveMessage(Component.empty());
+        event.leaveMessage(null);
         logInfo(player.getName() + " (" + player.getUniqueId() + ") was kicked silently while vanished.");
     }
 
@@ -905,11 +907,19 @@ public final class VanishManager implements Listener {
         }
     }
 
-    private void broadcastLocalizedQuit(Player player) {
+    private void broadcastLocalizedVanishJoin(Player player) {
+        broadcastLocalizedJoin(player);
+    }
+
+    private void broadcastLocalizedVanishQuit(Player player) {
+        broadcastLocalizedQuit(player, true);
+    }
+
+    private void broadcastLocalizedQuit(Player player, boolean includeSubject) {
         String name = player.getName();
 
         for (Player recipient : Bukkit.getOnlinePlayers()) {
-            if (!recipient.equals(player)) {
+            if (includeSubject || !recipient.equals(player)) {
                 recipient.sendMessage(Component.text(name + localized(recipient, QUIT_AR, QUIT_EN), NamedTextColor.YELLOW));
             }
         }
