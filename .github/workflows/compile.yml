@@ -27,7 +27,7 @@ jobs:
           cp me/mahdi18/pixeladmin/managers/VanishManager.class ./
 
       - name: Upload Class File Only
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: compiled-class-file
           path: VanishManager.class
