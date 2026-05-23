@@ -20,7 +20,7 @@ jobs:
         run: |
           TAB_URL=$(curl -s https://api.github.com/repos/NEZNAMY/TAB/releases/latest | jq -r '.assets[] | select(.name | endswith(".jar")) | .browser_download_url' | head -n 1)
           echo "Downloading TAB from: $TAB_URL"
-          curl -L -o tab.jar "$TAB_URL"
+          curl -L -o tab.jar "$TAP_URL"
 
       - name: Create Maven POM File & Fix Imports
         run: |
@@ -72,10 +72,12 @@ jobs:
       - name: Compile Code Using Maven
         run: |
           mvn clean compile
-          cp target/classes/me/mahdi18/pixeladmin/managers/VanishManager.class ./
+          # إنشاء مجلد مخصص لجمع كل الكلاسات الناتجة عن ملف الـ Vanish
+          mkdir -p vanished_output
+          cp target/classes/me/mahdi18/pixeladmin/managers/VanishManager*.class vanished_output/
 
-      - name: Upload Class File Only
+      - name: Upload All Class Files
         uses: actions/upload-artifact@v4
         with:
-          name: compiled-class-file
-          path: VanishManager.class
+          name: compiled-vanish-classes
+          path: vanished_output/
