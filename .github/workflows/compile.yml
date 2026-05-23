@@ -22,7 +22,7 @@ jobs:
           echo "Downloading TAB from: $TAB_URL"
           curl -L -o tab.jar "$TAB_URL"
 
-      - name: Create Maven POM File
+      - name: Create Maven POM File & Fix Imports
         run: |
           cat << 'EOF' > pom.xml
           <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -59,10 +59,15 @@ jobs:
           </project>
           EOF
 
-          # ترتيب المجلدات بالشكل الذي يفهمه نظام مافن لضمان استقرار التحويل
+          # ترتيب مجلدات المشروع
           mkdir -p src/main/java/me/mahdi18/pixeladmin/managers
+          mkdir -p src/main/java/me/mahdi18/pixeladmin
           mv VanishManager.java src/main/java/me/mahdi18/pixeladmin/managers/VanishManager.java
           echo "package me.mahdi18.pixeladmin; import org.bukkit.plugin.java.JavaPlugin; public class PixelAdmin extends JavaPlugin {}" > src/main/java/me/mahdi18/pixeladmin/PixelAdmin.java
+
+          # تصليح الكلمات والمسارات الخاطئة داخل ملفك تلقائياً وبلمح البصر
+          sed -i 's/org.bukkit.ScoreboardManager/org.bukkit.scoreboard.ScoreboardManager/g' src/main/java/me/mahdi18/pixeladmin/managers/VanishManager.java
+          sed -i 's/org.bukkit.event.player.PlayerPickupExperienceEvent/com.destroystokyo.paper.event.player.PlayerPickupExperienceEvent/g' src/main/java/me/mahdi18/pixeladmin/managers/VanishManager.java
 
       - name: Compile Code Using Maven
         run: |
